@@ -1,0 +1,22 @@
+env: prod
+
+http_server:
+  host: localhost
+  port: 8080
+  read_timeout: 10s
+  write_timeout: 10s
+
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  password: "your_password"
+  name: task_tracker
+  ssl_mode: disable
+
+auth:
+  jwt_secret: "your_jwt_secret"
+  token_ttl: 15m
+
+logger:
+  level: info
