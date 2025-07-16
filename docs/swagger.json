@@ -1,0 +1,101 @@
+{
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "json text/plain"
+    ],
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Разработка бекенда для отслеживания задач",
+        "title": "Трекер задач",
+        "contact": {
+            "name": "Антон",
+            "url": "https://github.com/IIAkSISII",
+            "email": "iiaksisii@gmail.com"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "paths": {
+        "/user": {
+            "post": {
+                "description": "Создаем нового пользователя с указанием имени, почты и пароля.\nПараметры передаются в теле запроса в качестве json-объекта.\nЕсли пользователя не удается создать, возвращаем ошибку.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Создать нового пользователя",
+                "parameters": [
+                    {
+                        "description": "Login, email и Password",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Пользователь успешно создан (без тела)",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid json payload или обязательные поля пустые",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Cannot create user: \u003cописание ошибки\u003e",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.CreateUserRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "login": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CreateUserResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 42
+                },
+                "message": {
+                    "type": "string",
+                    "example": "user created"
+                }
+            }
+        }
+    }
+}

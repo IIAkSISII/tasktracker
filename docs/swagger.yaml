@@ -1,0 +1,70 @@
+consumes:
+- application/json
+definitions:
+  dto.CreateUserRequest:
+    properties:
+      email:
+        type: string
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  dto.CreateUserResponse:
+    properties:
+      id:
+        example: 42
+        type: integer
+      message:
+        example: user created
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: iiaksisii@gmail.com
+    name: Антон
+    url: https://github.com/IIAkSISII
+  description: Разработка бекенда для отслеживания задач
+  title: Трекер задач
+  version: "1.0"
+paths:
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Создаем нового пользователя с указанием имени, почты и пароля.
+        Параметры передаются в теле запроса в качестве json-объекта.
+        Если пользователя не удается создать, возвращаем ошибку.
+      parameters:
+      - description: Login, email и Password
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Пользователь успешно создан (без тела)
+          schema:
+            $ref: '#/definitions/dto.CreateUserResponse'
+        "400":
+          description: Invalid json payload или обязательные поля пустые
+          schema:
+            type: string
+        "500":
+          description: 'Cannot create user: <описание ошибки>'
+          schema:
+            type: string
+      summary: Создать нового пользователя
+      tags:
+      - Users
+produces:
+- json text/plain
+schemes:
+- http
+- https
+swagger: "2.0"

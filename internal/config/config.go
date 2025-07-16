@@ -27,4 +27,4 @@ func GetConfigPath() string {
 		return path
 	}
 	return "remote/config.yaml"
-} // пока только такое решение
+}
