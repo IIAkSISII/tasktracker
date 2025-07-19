@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"database/sql"
+	"github.com/IIAkSISII/tasktracker/internal/logger"
 	"github.com/IIAkSISII/tasktracker/internal/models"
 )
 
@@ -11,11 +12,12 @@ type UserRepository interface {
 }
 
 type userRepository struct {
-	db *sql.DB
+	db     *sql.DB
+	logger logger.Logger
 }
 
-func NewUserRepository(db *sql.DB) UserRepository {
-	return &userRepository{db: db}
+func NewUserRepository(db *sql.DB, logger logger.Logger) UserRepository {
+	return &userRepository{db: db, logger: logger}
 }
 
 func (r *userRepository) Create(ctx context.Context, u *models.User) (int64, error) {

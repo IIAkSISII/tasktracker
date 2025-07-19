@@ -1,6 +1,7 @@
 package userHandler
 
 import (
+	"github.com/IIAkSISII/tasktracker/internal/logger"
 	"github.com/IIAkSISII/tasktracker/internal/service/user"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -8,10 +9,11 @@ import (
 
 type UserHandler struct {
 	service user.UserService
+	logger  logger.Logger
 }
 
-func NewUserHandler(service user.UserService) *UserHandler {
-	return &UserHandler{service: service}
+func NewUserHandler(service user.UserService, logger logger.Logger) *UserHandler {
+	return &UserHandler{service: service, logger: logger}
 }
 
 func (u *UserHandler) ConfigureRoutes(router *mux.Router) {

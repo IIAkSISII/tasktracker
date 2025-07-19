@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"github.com/IIAkSISII/tasktracker/internal/logger"
 	"github.com/IIAkSISII/tasktracker/internal/models"
 	"github.com/IIAkSISII/tasktracker/internal/repository/user"
 )
@@ -13,11 +14,12 @@ type UserService interface {
 }
 
 type userService struct {
-	repo user.UserRepository
+	repo   user.UserRepository
+	logger logger.Logger
 }
 
-func NewUserService(repo user.UserRepository) UserService {
-	return &userService{repo: repo}
+func NewUserService(repo user.UserRepository, logger logger.Logger) UserService {
+	return &userService{repo: repo, logger: logger}
 }
 
 func (u *userService) Create(ctx context.Context, login, email, password string) (int64, error) {

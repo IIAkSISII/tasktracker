@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/IIAkSISII/tasktracker/internal/config"
 	"github.com/IIAkSISII/tasktracker/internal/database"
+	"github.com/IIAkSISII/tasktracker/internal/logger"
 	userReposity "github.com/IIAkSISII/tasktracker/internal/repository/user"
 	userService "github.com/IIAkSISII/tasktracker/internal/service/user"
 	"github.com/IIAkSISII/tasktracker/internal/transport/http/userHandler"
@@ -21,7 +22,6 @@ import (
 // @contact.url	https://github.com/IIAkSISII
 // @contact.email	iiaksisii@gmail.com
 // @host			localhost:8080
-//
 // @accept			json
 // @produce		json text/plain
 // @schemes		http https
@@ -37,12 +37,18 @@ func main() {
 	}
 	defer db.Close()
 
-	uRepo := userReposity.NewUserRepository(db)
-	uSvc := userService.NewUserService(uRepo)
-	uHandler := userHandler.NewUserHandler(uSvc)
+	logger, err := logger.NewLogrusLogger(cfg.Logger.Level, cfg.Logger.Format)
+	if err != nil {
+		fmt.Println("Error initializing logger:", err)
+	}
+
+	uRepo := userReposity.NewUserRepository(db, logger)
+	uSvc := userService.NewUserService(uRepo, logger)
+	uHandler := userHandler.NewUserHandler(uSvc, logger)
 
 	router := mux.NewRouter()
 	router.Use(middlewares.CorsMiddleware)
+	router.Use(middlewares.LoggerMiddleware(logger))
 
 	uHandler.ConfigureRoutes(router)
 
