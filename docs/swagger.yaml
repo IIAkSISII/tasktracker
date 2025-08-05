@@ -1,6 +1,84 @@
 consumes:
 - application/json
 definitions:
+  dto.CreateBoardRequest:
+    properties:
+      name:
+        type: string
+      project_id:
+        type: integer
+    type: object
+  dto.CreateBoardResponse:
+    properties:
+      id:
+        example: 42
+        type: integer
+      message:
+        example: board created
+        type: string
+    type: object
+  dto.CreateProjectRequest:
+    properties:
+      created_at:
+        type: string
+      is_public:
+        type: boolean
+      name:
+        type: string
+    type: object
+  dto.CreateProjectResponse:
+    properties:
+      id:
+        example: 42
+        type: integer
+      message:
+        example: project created
+        type: string
+    type: object
+  dto.CreateTaskRequest:
+    properties:
+      description:
+        type: string
+      label_id:
+        type: integer
+      name:
+        type: string
+      ticket_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  dto.CreateTaskResponse:
+    properties:
+      id:
+        example: 42
+        type: integer
+      message:
+        example: task created
+        type: string
+    type: object
+  dto.CreateTicketRequest:
+    properties:
+      board_id:
+        type: integer
+      description:
+        type: string
+      label_id:
+        type: integer
+      name:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  dto.CreateTicketResponse:
+    properties:
+      id:
+        example: 42
+        type: integer
+      message:
+        example: ticket created
+        type: string
+    type: object
   dto.CreateUserRequest:
     properties:
       email:
@@ -19,6 +97,35 @@ definitions:
         example: user created
         type: string
     type: object
+  dto.MoveTicketRequest:
+    properties:
+      new_board_id:
+        type: integer
+      ticket_id:
+        type: integer
+    type: object
+  dto.MoveTicketResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  dto.SearchTaskResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      label_id:
+        type: integer
+      name:
+        type: string
+      ticket_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -29,6 +136,213 @@ info:
   title: Трекер задач
   version: "1.0"
 paths:
+  /board:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Создаем новую доску с указанием названия и проекта, к которому она принадлежит.
+        Параметры передаются в теле запроса в качестве json-объекта.
+        Если доску не удается создать, возвращаем ошибку.
+      parameters:
+      - description: name и project_id
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateBoardRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Доска успешно создана
+          schema:
+            $ref: '#/definitions/dto.CreateBoardResponse'
+        "400":
+          description: Invalid json payload, Board name is required или ProjectID
+            must be positive
+          schema:
+            type: string
+        "500":
+          description: 'Cannot create board: <описание ошибки>'
+          schema:
+            type: string
+      summary: Создать новый доску
+      tags:
+      - Boards
+  /project:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Создаем новый проект с указанием названия, даты создания и приватности.
+        Параметры передаются в теле запроса в качестве json-объекта.
+        Если проект не удается создать, возвращаем ошибку.
+      parameters:
+      - description: Name, isPublic и CreatedAt
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateProjectRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Проект успешно создан
+          schema:
+            $ref: '#/definitions/dto.CreateProjectResponse'
+        "400":
+          description: Invalid json payload или Project name is required
+          schema:
+            type: string
+        "500":
+          description: 'Failed to create project: <описание ошибки>'
+          schema:
+            type: string
+      summary: Создать новый проект
+      tags:
+      - Projects
+  /task:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Создаем новую задачу с указанием имени, описания, пользователя, метки и карточки.
+        Параметры передаются в теле запроса в качестве json-объекта.
+        Если карточку не удается создать, возвращаем ошибку.
+      parameters:
+      - description: name, description, user_id, label_id, ticket_id
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Задача успешно создана
+          schema:
+            $ref: '#/definitions/dto.CreateTaskResponse'
+        "400":
+          description: Invalid json payload, Name is required или LabelId, TicketId
+            or UserId must be positive
+          schema:
+            type: string
+        "500":
+          description: 'Cannot create ticket: <описание ошибки>'
+          schema:
+            type: string
+      summary: Создать новую задачу
+      tags:
+      - Tasks
+  /task/search:
+    get:
+      consumes:
+      - application/json
+      description: Поиск задач по названию, метке и пользователю
+      parameters:
+      - description: Часть названия задачи
+        in: query
+        name: name
+        type: string
+      - description: ID метки
+        in: query
+        name: label_id
+        type: integer
+      - description: ID исполнителя
+        in: query
+        name: user_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список найденных задач
+          schema:
+            items:
+              $ref: '#/definitions/dto.SearchTaskResponse'
+            type: array
+        "400":
+          description: Invalid label_id or user_id
+          schema:
+            type: string
+        "500":
+          description: 'Failed to search tasks: <описание ошибки>'
+          schema:
+            type: string
+      summary: Поиск задач
+      tags:
+      - Tasks
+  /ticket:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Создаем новую карточку с указанием имени, описания, пользователя, метки и доски.
+        Параметры передаются в теле запроса в качестве json-объекта.
+        Если карточку не удается создать, возвращаем ошибку.
+      parameters:
+      - description: name, description, user_id, label_id, project_id
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateTicketRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Карточка успешно создана
+          schema:
+            $ref: '#/definitions/dto.CreateTicketResponse'
+        "400":
+          description: Invalid json payload, Name is required или LabelId, BoardId
+            or UserId must be positive
+          schema:
+            type: string
+        "500":
+          description: 'Cannot create ticket: <описание ошибки>'
+          schema:
+            type: string
+      summary: Создать новую карточку
+      tags:
+      - Tickets
+  /ticket/move:
+    put:
+      consumes:
+      - application/json
+      description: |-
+        Перемещаем карточку с указанием id карточки и id новой доски.
+        Параметры передаются в теле запроса в качестве json-объекта.
+        Если карточку не удается создать, возвращаем ошибку.
+      parameters:
+      - description: ticket_id, new_board_id
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.MoveTicketRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Карточка успешно перемещена
+          schema:
+            $ref: '#/definitions/dto.MoveTicketResponse'
+        "400":
+          description: Invalid json payload, Name is required или TicketId or BoardId
+            must be positive
+          schema:
+            type: string
+        "500":
+          description: 'Cannot move ticket: <описание ошибки>'
+          schema:
+            type: string
+      summary: Переместить карточку на другую доску
+      tags:
+      - Tickets
   /user:
     post:
       consumes:
@@ -48,7 +362,7 @@ paths:
       - application/json
       responses:
         "201":
-          description: Пользователь успешно создан (без тела)
+          description: Пользователь успешно создан
           schema:
             $ref: '#/definitions/dto.CreateUserResponse'
         "400":

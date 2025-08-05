@@ -25,6 +25,294 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/board": {
+            "post": {
+                "description": "Создаем новую доску с указанием названия и проекта, к которому она принадлежит.\nПараметры передаются в теле запроса в качестве json-объекта.\nЕсли доску не удается создать, возвращаем ошибку.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Boards"
+                ],
+                "summary": "Создать новый доску",
+                "parameters": [
+                    {
+                        "description": "name и project_id",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateBoardRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Доска успешно создана",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateBoardResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid json payload, Board name is required или ProjectID must be positive",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Cannot create board: \u003cописание ошибки\u003e",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/project": {
+            "post": {
+                "description": "Создаем новый проект с указанием названия, даты создания и приватности.\nПараметры передаются в теле запроса в качестве json-объекта.\nЕсли проект не удается создать, возвращаем ошибку.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Создать новый проект",
+                "parameters": [
+                    {
+                        "description": "Name, isPublic и CreatedAt",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateProjectRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Проект успешно создан",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateProjectResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid json payload или Project name is required",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create project: \u003cописание ошибки\u003e",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/task": {
+            "post": {
+                "description": "Создаем новую задачу с указанием имени, описания, пользователя, метки и карточки.\nПараметры передаются в теле запроса в качестве json-объекта.\nЕсли карточку не удается создать, возвращаем ошибку.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Создать новую задачу",
+                "parameters": [
+                    {
+                        "description": "name, description, user_id, label_id, ticket_id",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateTaskRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Задача успешно создана",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateTaskResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid json payload, Name is required или LabelId, TicketId or UserId must be positive",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Cannot create ticket: \u003cописание ошибки\u003e",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/task/search": {
+            "get": {
+                "description": "Поиск задач по названию, метке и пользователю",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "Поиск задач",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Часть названия задачи",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID метки",
+                        "name": "label_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID исполнителя",
+                        "name": "user_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Список найденных задач",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.SearchTaskResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid label_id or user_id",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to search tasks: \u003cописание ошибки\u003e",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ticket": {
+            "post": {
+                "description": "Создаем новую карточку с указанием имени, описания, пользователя, метки и доски.\nПараметры передаются в теле запроса в качестве json-объекта.\nЕсли карточку не удается создать, возвращаем ошибку.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Создать новую карточку",
+                "parameters": [
+                    {
+                        "description": "name, description, user_id, label_id, project_id",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateTicketRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Карточка успешно создана",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateTicketResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid json payload, Name is required или LabelId, BoardId or UserId must be positive",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Cannot create ticket: \u003cописание ошибки\u003e",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ticket/move": {
+            "put": {
+                "description": "Перемещаем карточку с указанием id карточки и id новой доски.\nПараметры передаются в теле запроса в качестве json-объекта.\nЕсли карточку не удается создать, возвращаем ошибку.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Переместить карточку на другую доску",
+                "parameters": [
+                    {
+                        "description": "ticket_id, new_board_id",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.MoveTicketRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Карточка успешно перемещена",
+                        "schema": {
+                            "$ref": "#/definitions/dto.MoveTicketResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid json payload, Name is required или TicketId or BoardId must be positive",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Cannot move ticket: \u003cописание ошибки\u003e",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "post": {
                 "description": "Создаем нового пользователя с указанием имени, почты и пароля.\nПараметры передаются в теле запроса в качестве json-объекта.\nЕсли пользователя не удается создать, возвращаем ошибку.",
@@ -51,7 +339,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Пользователь успешно создан (без тела)",
+                        "description": "Пользователь успешно создан",
                         "schema": {
                             "$ref": "#/definitions/dto.CreateUserResponse"
                         }
@@ -73,6 +361,123 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.CreateBoardRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "project_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.CreateBoardResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 42
+                },
+                "message": {
+                    "type": "string",
+                    "example": "board created"
+                }
+            }
+        },
+        "dto.CreateProjectRequest": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "is_public": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CreateProjectResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 42
+                },
+                "message": {
+                    "type": "string",
+                    "example": "project created"
+                }
+            }
+        },
+        "dto.CreateTaskRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "label_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ticket_id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.CreateTaskResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 42
+                },
+                "message": {
+                    "type": "string",
+                    "example": "task created"
+                }
+            }
+        },
+        "dto.CreateTicketRequest": {
+            "type": "object",
+            "properties": {
+                "board_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "label_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.CreateTicketResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 42
+                },
+                "message": {
+                    "type": "string",
+                    "example": "ticket created"
+                }
+            }
+        },
         "dto.CreateUserRequest": {
             "type": "object",
             "properties": {
@@ -97,6 +502,51 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "user created"
+                }
+            }
+        },
+        "dto.MoveTicketRequest": {
+            "type": "object",
+            "properties": {
+                "new_board_id": {
+                    "type": "integer"
+                },
+                "ticket_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.MoveTicketResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SearchTaskResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "label_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ticket_id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         }

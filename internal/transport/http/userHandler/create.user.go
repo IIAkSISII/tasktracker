@@ -16,7 +16,7 @@ import (
 // @Accept			json
 // @Produce		json
 // @Param			input	body		dto.CreateUserRequest	true	"Login, email и Password"
-// @Success		201		{object}	dto.CreateUserResponse	"Пользователь успешно создан (без тела)"
+// @Success		201		{object}	dto.CreateUserResponse	"Пользователь успешно создан"
 // @Failure		400		{string}	string					"Invalid json payload или обязательные поля пустые"
 // @Failure		500		{string}	string					"Cannot create user: <описание ошибки>"
 // @Router			/user [post]

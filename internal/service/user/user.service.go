@@ -10,7 +10,7 @@ import (
 )
 
 type UserService interface {
-	Create(ctx context.Context, login, email, password string) (int64, error)
+	Create(ctx context.Context, login, email, password string) (int, error)
 }
 
 type userService struct {
@@ -22,7 +22,7 @@ func NewUserService(repo user.UserRepository, logger logger.Logger) UserService 
 	return &userService{repo: repo, logger: logger}
 }
 
-func (u *userService) Create(ctx context.Context, login, email, password string) (int64, error) {
+func (u *userService) Create(ctx context.Context, login, email, password string) (int, error) {
 	hashed := hashPassword(password)
 	newUser := &models.User{
 		Login:        login,

@@ -5,8 +5,20 @@ import (
 	"github.com/IIAkSISII/tasktracker/internal/config"
 	"github.com/IIAkSISII/tasktracker/internal/database"
 	"github.com/IIAkSISII/tasktracker/internal/logger"
+	boardRepository "github.com/IIAkSISII/tasktracker/internal/repository/board"
+	projectRepository "github.com/IIAkSISII/tasktracker/internal/repository/project"
+	taskRepository "github.com/IIAkSISII/tasktracker/internal/repository/task"
+	ticketRepository "github.com/IIAkSISII/tasktracker/internal/repository/ticket"
 	userReposity "github.com/IIAkSISII/tasktracker/internal/repository/user"
+	boardSevice "github.com/IIAkSISII/tasktracker/internal/service/board"
+	projectService "github.com/IIAkSISII/tasktracker/internal/service/project"
+	taskService "github.com/IIAkSISII/tasktracker/internal/service/task"
+	ticketService "github.com/IIAkSISII/tasktracker/internal/service/ticket"
 	userService "github.com/IIAkSISII/tasktracker/internal/service/user"
+	"github.com/IIAkSISII/tasktracker/internal/transport/http/boardHandler"
+	"github.com/IIAkSISII/tasktracker/internal/transport/http/projectHandler"
+	"github.com/IIAkSISII/tasktracker/internal/transport/http/taskHandler"
+	"github.com/IIAkSISII/tasktracker/internal/transport/http/ticketHandler"
 	"github.com/IIAkSISII/tasktracker/internal/transport/http/userHandler"
 	"github.com/IIAkSISII/tasktracker/internal/transport/middlewares"
 	"github.com/gorilla/mux"
@@ -46,11 +58,31 @@ func main() {
 	uSvc := userService.NewUserService(uRepo, logger)
 	uHandler := userHandler.NewUserHandler(uSvc, logger)
 
+	pRepo := projectRepository.NewProjectRepository(db, logger)
+	pSvc := projectService.NewProjectService(pRepo, logger)
+	pHandler := projectHandler.NewProjectHandler(pSvc, logger)
+
+	bRepo := boardRepository.NewBoardRepository(db, logger)
+	bSvc := boardSevice.NewBoardService(bRepo, logger)
+	bHandler := boardHandler.NewBoardHandler(bSvc, logger)
+
+	tRepo := ticketRepository.NewTicketRepository(db, logger)
+	tSvc := ticketService.NewTicketService(tRepo, logger)
+	tHandler := ticketHandler.NewTicketHandler(tSvc, logger)
+
+	taskRepo := taskRepository.NewTaskRepository(db, logger)
+	taskSvc := taskService.NewTicketService(taskRepo, logger)
+	taskHandler := taskHandler.NewTaskHandler(taskSvc, logger)
+
 	router := mux.NewRouter()
 	router.Use(middlewares.CorsMiddleware)
 	router.Use(middlewares.LoggerMiddleware(logger))
 
 	uHandler.ConfigureRoutes(router)
+	pHandler.ConfigureRoutes(router)
+	bHandler.ConfigureRoutes(router)
+	tHandler.ConfigureRoutes(router)
+	taskHandler.ConfigureRoutes(router)
 
 	router.HandleFunc("/swagger/doc.json", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./docs/swagger.json")

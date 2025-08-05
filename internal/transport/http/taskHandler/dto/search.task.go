@@ -1,11 +1,11 @@
-package models
+package dto
 
 import "time"
 
-type Task struct {
+type SearchTaskResponse struct {
 	Id          int       `json:"id"`
 	Name        string    `json:"name"`
-	Description string    `json:"description"`
+	Description string    `json:"description,omitempty"`
 	CreatedAt   time.Time `json:"created_at"`
 	UserId      int       `json:"user_id"`
 	LabelId     int       `json:"label_id"`
