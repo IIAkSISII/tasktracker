@@ -1,0 +1,16 @@
+DROP INDEX IF EXISTS idx_users_password_hash;
+DROP INDEX IF EXISTS idx_boards_project_id;
+DROP INDEX IF EXISTS idx_labels_name;
+DROP INDEX IF EXISTS idx_projects_created_at;
+DROP INDEX IF EXISTS idx_tickets_created_at;
+DROP INDEX IF EXISTS idx_tickets_user_id;
+DROP INDEX IF EXISTS idx_tickets_label_id;
+DROP INDEX IF EXISTS idx_tickets_board_id;
+DROP INDEX IF EXISTS idx_tasks_created_at;
+DROP INDEX IF EXISTS idx_tasks_user_id;
+DROP INDEX IF EXISTS idx_tasks_label_id;
+DROP INDEX IF EXISTS idx_tasks_ticket_id;
+DROP INDEX IF EXISTS idx_tasks_name;
+DROP INDEX IF EXISTS idx_pm_user_id;
+DROP INDEX IF EXISTS idx_pm_project_id;
+DROP INDEX IF EXISTS idx_pm_role_id;

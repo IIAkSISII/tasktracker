@@ -1,0 +1,16 @@
+CREATE INDEX IF NOT EXISTS idx_users_password_hash ON users(password_hash);
+CREATE INDEX IF NOT EXISTS idx_boards_project_id ON boards(project_id_fk);
+CREATE INDEX IF NOT EXISTS idx_labels_name ON labels(name);
+CREATE INDEX IF NOT EXISTS idx_projects_created_at ON projects(created_at);
+CREATE INDEX IF NOT EXISTS idx_tickets_created_at ON tickets(created_at);
+CREATE INDEX IF NOT EXISTS idx_tickets_user_id ON tickets(user_id_fk);
+CREATE INDEX IF NOT EXISTS idx_tickets_label_id ON tickets(label_id_fk);
+CREATE INDEX IF NOT EXISTS idx_tickets_board_id ON tickets(board_id_fk);
+CREATE INDEX IF NOT EXISTS idx_tasks_created_at ON tasks(created_at);
+CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON tasks(user_id_fk);
+CREATE INDEX IF NOT EXISTS idx_tasks_label_id ON tasks(label_id_fk);
+CREATE INDEX IF NOT EXISTS idx_tasks_ticket_id ON tasks(ticket_id_fk);
+CREATE INDEX IF NOT EXISTS idx_tasks_name ON tasks USING GIN(name gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_pm_user_id ON project_members(user_id_fk);
+CREATE INDEX IF NOT EXISTS idx_pm_project_id ON project_members(project_id_fk);
+CREATE INDEX IF NOT EXISTS idx_pm_role_id ON project_members(role_id_fk);
